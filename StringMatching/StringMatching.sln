@@ -1,0 +1,26 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 10.00
+# Visual Studio 2008
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StringMatching", "StringMatching\StringMatching.csproj", "{7B62224E-B789-47EC-ACCA-DA37FA43A591}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestProject", "TestProject\TestProject.csproj", "{385C369E-1F02-4DC2-986C-ADBBA4C5AC47}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{7B62224E-B789-47EC-ACCA-DA37FA43A591}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7B62224E-B789-47EC-ACCA-DA37FA43A591}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7B62224E-B789-47EC-ACCA-DA37FA43A591}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7B62224E-B789-47EC-ACCA-DA37FA43A591}.Release|Any CPU.Build.0 = Release|Any CPU
+		{385C369E-1F02-4DC2-986C-ADBBA4C5AC47}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{385C369E-1F02-4DC2-986C-ADBBA4C5AC47}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{385C369E-1F02-4DC2-986C-ADBBA4C5AC47}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{385C369E-1F02-4DC2-986C-ADBBA4C5AC47}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
