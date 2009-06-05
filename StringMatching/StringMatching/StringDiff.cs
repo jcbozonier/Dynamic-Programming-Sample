@@ -24,6 +24,8 @@ namespace StringMatching
             var oldStringIndex = oldString.Length - 1;
             var newStringIndex = newString.Length - 1;
 
+            var transformedString = oldString.Clone().ToString();
+
             while (oldStringIndex >= 0 || newStringIndex >= 0)
             {
                 // Deal with current cell
@@ -41,7 +43,9 @@ namespace StringMatching
                     if(topLeftPathValue <= leftPathValue && topLeftPathValue <= topPathValue)
                     {
                         if(oldString[oldStringIndex] != newString[newStringIndex])
+                        {
                             executionPlanBuilder.Swap(newStringIndex, oldStringIndex);
+                        }
                         newStringIndex--;
                         oldStringIndex--;
                         
@@ -58,7 +62,7 @@ namespace StringMatching
 
                     if(topPathValue <= topLeftPathValue && topPathValue <= leftPathValue)
                     {
-                        executionPlanBuilder.Insert(newStringIndex);
+                        executionPlanBuilder.Insert(newStringIndex, oldStringIndex);
                         newStringIndex--;
 
                         continue;
@@ -76,19 +80,19 @@ namespace StringMatching
                 if(topPathIsValid && 
                     editDistanceMatrix[oldStringIndex][newStringIndex-1] <= editDistanceMatrix[oldStringIndex][newStringIndex])
                 {
-                    executionPlanBuilder.Insert(newStringIndex);
+                    executionPlanBuilder.Insert(newStringIndex, oldStringIndex);
                     newStringIndex--;
                     continue;
                 }
 
                 if (!leftPathIsValid && !topPathIsValid)
                 {
-                    if(oldString[oldStringIndex] != newString[newStringIndex])
+                    if(!executionPlanBuilder.FirstCharacterEquals(oldString[oldStringIndex]))
                     {
                         executionPlanBuilder.Swap(newStringIndex, oldStringIndex);
                     }
-
-                    return executionPlanBuilder;
+                    oldStringIndex--;
+                    newStringIndex--;
                 }
             }
 
@@ -122,9 +126,9 @@ namespace StringMatching
 
             var localEditDistance = oldChar == newChar ? 0 : 1;
 
-            var leftArrayValue = localEditDistance + _GetCellValue(matrix, oldCharacterIndex - 1, newCharacterIndex);
-            var topLeftArrayValue = localEditDistance + _GetCellValue(matrix, oldCharacterIndex - 1, newCharacterIndex - 1);
-            var topArrayValue = localEditDistance + _GetCellValue(matrix, oldCharacterIndex, newCharacterIndex - 1);
+            var leftArrayValue = _GetCellValue(matrix, oldCharacterIndex - 1, newCharacterIndex) + 1;
+            var topLeftArrayValue = _GetCellValue(matrix, oldCharacterIndex - 1, newCharacterIndex - 1) + localEditDistance;
+            var topArrayValue = _GetCellValue(matrix, oldCharacterIndex, newCharacterIndex - 1) + 1;
 
             var minEditDistance = Math.Min(Math.Min(leftArrayValue, topLeftArrayValue), topArrayValue);
 
@@ -167,9 +171,9 @@ namespace StringMatching
             Steps.Push(new DeleteStep(oldStringIndex));
         }
 
-        public void Insert(int newStringIndex)
+        public void Insert(int newStringIndex, int oldStringIndex)
         {
-            Steps.Push(new InsertStep(newStringIndex));
+            Steps.Push(new InsertStep(oldStringIndex, newStringIndex));
         }
 
         public string PrintStep(int index)
@@ -190,12 +194,29 @@ namespace StringMatching
 
             return result;
         }
+
+        public bool FirstCharacterEquals(char oldCharacter)
+        {
+            if(Steps.Count > 0)
+            {
+                var firstStep = Steps.First();
+
+                if(firstStep is InsertStep)
+                {
+                    var insertStep = (InsertStep) firstStep;
+                    if (insertStep._OldStringIndex == 0)
+                        return _NewString[insertStep._NewStringIndex].Equals(oldCharacter);
+                }
+            }
+            
+            return _NewString[0].Equals(oldCharacter);
+        }
     }
 
     public class SwapStep : Step
     {
-        private int _NewStringIndex;
-        private int _OldStringIndex;
+        public int _NewStringIndex;
+        public int _OldStringIndex;
 
         public SwapStep(int newStringIndex, int oldStringIndex)
         {
@@ -228,16 +249,18 @@ namespace StringMatching
 
     public class InsertStep : Step
     {
-        private int _NewStringIndex;
+        public int _NewStringIndex;
+        public int _OldStringIndex;
 
-        public InsertStep(int newStringIndex)
+        public InsertStep(int oldStringIndex, int newStringIndex)
         {
             _NewStringIndex = newStringIndex;
+            _OldStringIndex = oldStringIndex;
         }
 
         public override string Print(string oldString, string newString)
         {
-            return String.Format("Inserted new character \"{0}\"", newString[_NewStringIndex]);
+            return String.Format("Inserted new character \"{0}\" at index {1}", newString[_NewStringIndex], _OldStringIndex);
         }
     }
 

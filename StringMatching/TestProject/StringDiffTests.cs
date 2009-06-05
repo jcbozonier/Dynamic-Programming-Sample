@@ -61,8 +61,8 @@ namespace TestProject
         [Test]
         public void MultiItem_Diff_Horizontal_Assymetrical_Test()
         {
-            var stringA = "abdbca";
-            var stringB = "abc";
+            var stringA = "bcdeffghi";
+            var stringB = "abcdefghij";
 
             var diff = new StringDiff();
             var executionPlan = diff.Between(stringA, stringB);
