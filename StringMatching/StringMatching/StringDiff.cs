@@ -32,14 +32,6 @@ namespace StringMatching
                 var leftPathIsValid = oldStringIndex > 0;
                 var topPathIsValid = newStringIndex > 0;
 
-                if (editDistanceMatrix[oldStringIndex][newStringIndex] == 0)
-                {
-                    // Do nothing here...
-                    oldStringIndex--;
-                    newStringIndex--;
-                    continue;
-                }
-
                 if(leftPathIsValid && topPathIsValid)
                 {
                     var leftPathValue = editDistanceMatrix[oldStringIndex - 1][newStringIndex];
@@ -48,7 +40,8 @@ namespace StringMatching
 
                     if(topLeftPathValue <= leftPathValue && topLeftPathValue <= topPathValue)
                     {
-                        executionPlanBuilder.Swap(newStringIndex, oldStringIndex);
+                        if(oldString[oldStringIndex] != newString[newStringIndex])
+                            executionPlanBuilder.Swap(newStringIndex, oldStringIndex);
                         newStringIndex--;
                         oldStringIndex--;
                         
@@ -111,33 +104,43 @@ namespace StringMatching
             //First fill out table
             foreach (var oldCharacterIndex in Enumerable.Range(0, oldString.Length))
             {
-                var oldCharacter = oldString[oldCharacterIndex];
-
                 foreach (var newCharacterIndex in Enumerable.Range(0, newString.Length))
                 {
-                    var newCharacter = newString[newCharacterIndex];
+                    var editDistanceAtCell = _CalculateMinimumCellEditDistance(editDistanceMatrix, oldString, oldCharacterIndex, newString, newCharacterIndex);
 
-                    var editDistanceBetweenCharacters = _CalculateEditDistance(oldCharacter,
-                                                                               oldCharacterIndex,
-                                                                               newCharacter,
-                                                                               newCharacterIndex);
-                    editDistanceMatrix[oldCharacterIndex].Add(editDistanceBetweenCharacters);
+                    editDistanceMatrix[oldCharacterIndex].Add(editDistanceAtCell);
                 }
             }
 
             return editDistanceMatrix;
         }
 
-        private static int _CalculateEditDistance(char oldCharacter, int oldCharacterIndex, char newCharacter, int newCharacterIndex)
+        private static int _CalculateMinimumCellEditDistance(List<List<int>> matrix, string oldString, int oldCharacterIndex, string newString, int newCharacterIndex)
         {
-            // first find the insert/delete distance by subtracting the 
-            // old index from the new and getting the absolute value.
-            var editDistanceDelta1 = Math.Abs(newCharacterIndex - oldCharacterIndex);
+            var oldChar = oldString[oldCharacterIndex];
+            var newChar = newString[newCharacterIndex];
 
-            // then if the two characters are different add one for a conversion tax.
-            var editDistanceDelta2 = oldCharacter == newCharacter ? 0 : 1;
+            var localEditDistance = oldChar == newChar ? 0 : 1;
 
-            return editDistanceDelta1 + editDistanceDelta2;
+            var leftArrayValue = localEditDistance + _GetCellValue(matrix, oldCharacterIndex - 1, newCharacterIndex);
+            var topLeftArrayValue = localEditDistance + _GetCellValue(matrix, oldCharacterIndex - 1, newCharacterIndex - 1);
+            var topArrayValue = localEditDistance + _GetCellValue(matrix, oldCharacterIndex, newCharacterIndex - 1);
+
+            var minEditDistance = Math.Min(Math.Min(leftArrayValue, topLeftArrayValue), topArrayValue);
+
+            return minEditDistance;
+        }
+
+        private static int _GetCellValue(List<List<int>> matrix, int oldCharacterIndex, int newCharacterIndex)
+        {
+            if (oldCharacterIndex < 0 && newCharacterIndex < 0)
+                return 0;
+            if (oldCharacterIndex < 0)
+                return newCharacterIndex + 1;
+            if (newCharacterIndex < 0)
+                return oldCharacterIndex + 1;
+            return matrix[oldCharacterIndex][newCharacterIndex];
+
         }
     }
 
